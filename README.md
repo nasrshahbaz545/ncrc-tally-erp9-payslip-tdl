@@ -1,6 +1,6 @@
 # Tally.ERP 9 Payslip TDL
 
-An unofficial, open-source TDL customization for producing structured government-style employee payslips in Tally.ERP 9.
+Built using Tally Developer mode. It is an unofficial, open-source TDL customization for producing structured government-style employee payslips in Tally.ERP 9.
 
 The customization improves individual and multi-employee payslip printing and adds selected employee-master information without intentionally changing native payroll calculations.
 
