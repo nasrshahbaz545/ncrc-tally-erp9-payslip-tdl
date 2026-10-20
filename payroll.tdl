@@ -1,0 +1,906 @@
+;; ============================================================================
+;; NCRC PAY SLIP CUSTOMIZATION
+;; REVISION 16 - COMPLETE STABLE VERSION
+;; ============================================================================
+;;
+;; FINAL REQUIREMENTS
+;; ------------------
+;; 1. Company name in header
+;; 2. Title-1 of Pakistan below company name
+;; 3. Single native dynamic payslip period in custom header
+;; 4. No duplicate native title
+;; 5. No empty space between header and employee table
+;; 6. Employee Name in left table
+;; 7. Employee Number in right table
+;; 8. CNIC retrieved from PassportDetails without formatting
+;; 9. Status shown as Regular
+;; 10. DDO Code shown as 
+;; 11. Scale taken from employee parent group
+;; 12. Location shown as Islamabad, Pakistan
+;; 13. Date of Joining retrieved from employee master
+;; 14. Normal readable text in employee table and footer
+;; 15. Pay-head names shown without numeric account codes in print
+;; 16. Accounts Officer aligned with Authorised Signatory
+;; 17. Computer-generated disclaimer at bottom
+;; 18. Errors and omissions clause at bottom
+;;
+;; NATIVE PAYROLL CALCULATIONS ARE NOT ALTERED.
+;;
+;; ============================================================================
+
+
+;; ============================================================================
+;; SECTION 1: HEADER FIELDS
+;; ============================================================================
+
+[Field : NCRC Company Field]
+
+    Use        : Name Field
+    Set As     : ##SVCurrentCompany
+    Full Width : Yes
+    Align      : Centre
+    Style      : Normal Bold
+
+
+[Field : NCRC Title-1 Field]
+
+    Use        : Name Field
+    Set As     : "Title-1 of Pakistan"
+    Full Width : Yes
+    Align      : Centre
+    Style      : Normal Bold
+
+
+;; ============================================================================
+;; SECTION 2: EMPLOYEE INFORMATION FIELDS
+;; ============================================================================
+
+[Field : NCRC Employee Number Field]
+
+    Use        : Name Field
+    Set As     : $AdditionalName:CostCentre:##CostCentreName
+    Width      : 32% Screen
+    Style      : Normal Bold
+
+
+[Field : NCRC Status Field]
+
+    Use        : Name Field
+    Set As     : "Regular"
+    Width      : 32% Screen
+    Style      : Normal
+
+
+[Field : NCRC DDO Field]
+
+    Use        : Name Field
+    Set As     : "DDO-ISB"
+    Width      : 32% Screen
+    Style      : Normal
+
+
+[Field : NCRC Scale Field]
+
+    Use        : Name Field
+    Set As     : $Parent:CostCentre:##CostCentreName
+    Width      : 32% Screen
+    Style      : Normal
+
+
+[Field : NCRC Joining Date Field]
+
+    Use        : Name Field
+    Set As     : $DateofJoin:CostCentre:##CostCentreName
+    Width      : 32% Screen
+    Style      : Normal
+
+
+;; ============================================================================
+;; SECTION 3: HEADER LINES
+;; ============================================================================
+
+[Line : NCRC Title-1 Line]
+
+    Field : NCRC Title-1 Field
+
+
+[Line : NCRC Company Line]
+
+    Field : NCRC Company Field
+
+
+
+;; ============================================================================
+;; SECTION 4: EMPLOYEE INFORMATION LINES
+;; ============================================================================
+
+[Line : NCRC Employee Number Line]
+
+    Fields : Medium Prompt, NCRC Employee Number Field
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "Employee Number"
+    Local : Field : Medium Prompt : Style : Normal
+
+
+[Line : NCRC Status Line]
+
+    Fields : Medium Prompt, NCRC Status Field
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "Status"
+    Local : Field : Medium Prompt : Style : Normal
+
+
+[Line : NCRC DDO Line]
+
+    Fields : Medium Prompt, NCRC DDO Field
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "DDO Code"
+    Local : Field : Medium Prompt : Style : Normal
+
+
+[Line : NCRC Scale Line]
+
+    Fields : Medium Prompt, NCRC Scale Field
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "Scale"
+    Local : Field : Medium Prompt : Style : Normal
+
+
+;; ============================================================================
+;; DATE OF JOINING
+;; Uses a custom Name Field and retrieves DateofJoin from the selected employee.
+;; ============================================================================
+
+[Line : NCRC Joining Date Line]
+
+    Fields : Medium Prompt, NCRC Joining Date Field
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "Date of Joining"
+    Local : Field : Medium Prompt : Style : Normal
+
+
+;; ============================================================================
+;; SECTION 5: FOOTER LINES
+;; ============================================================================
+
+[Line : NCRC Accounts Officer Line]
+
+    Right Fields : Simple Field
+
+    Local : Field : Simple Field : Set As     : "ACCOUNTS OFFICER"
+    Local : Field : Simple Field : Style      : Normal
+    Local : Field : Simple Field : Full Width : Yes
+    Local : Field : Simple Field : Align      : Right
+
+    Local : Field : Simple Field : Invisible : +
+            NOT ##PayslipShowAuthorisedSign OR $$InMailAction
+
+
+[Line : NCRC Footer Spacer Line]
+
+    Field : Name Field
+
+    Local : Field : Name Field : Set As     : ""
+    Local : Field : Name Field : Full Width : Yes
+    Local : Field : Name Field : Lines      : 20
+
+
+[Line : NCRC Disclaimer One Line]
+
+    Right Fields : Simple Field
+    Border       : Thin Top
+
+    Local : Field : Simple Field : Set As : +
+            "This is a computer-generated pay slip and does not require a signature."
+
+    Local : Field : Simple Field : Full Width : Yes
+    Local : Field : Simple Field : Align      : center
+    Local : Field : Simple Field : Style      : tiny
+
+
+[Line : NCRC Disclaimer Two Line]
+
+    Right Fields : Simple Field
+    Border       : Thin Bottom
+
+    Local : Field : Simple Field : Set As : +
+            "Errors and omissions excepted. In case of any discrepancy, the official payroll record shall prevail."
+
+    Local : Field : Simple Field : Full Width : Yes
+    Local : Field : Simple Field : Align      : center
+    Local : Field : Simple Field : Style      : tiny
+    Local : Field : Simple Field : Lines      : 1
+
+
+;; ============================================================================
+;; SECTION 6: CUSTOM HEADER PART
+;; ============================================================================
+
+[Part : NCRC Header Part]
+
+    Lines : NCRC Title-1 Line, +
+		NCRC Company Line
+            
+    Space Top    : 0
+    Space Bottom : 0
+
+
+;; ============================================================================
+;; SECTION 7: ALTER PAYSLIP FORM
+;;
+;; IMPORTANT:
+;; Native title Parts are DELETED, not merely hidden.
+;; This prevents the deleted Parts from reserving blank vertical space.
+;;
+;; Only the NCRC Header Part remains above the employee table.
+;; ============================================================================
+
+[#Form : PaySlip]
+
+    Delete : Parts : Payslip Title with Logo Opt
+    Delete : Parts : Payslip Title
+
+    Add : Parts : At Beginning : NCRC Header Part
+
+
+;; ============================================================================
+;; SECTION 8: REMOVE SPACE BEFORE EMPLOYEE TABLE
+;; ============================================================================
+
+[#Part : Payslip Emp Dtls]
+
+    Space Top    : 0
+    Space Bottom : 0
+
+
+;; ============================================================================
+;; SECTION 9: ALTER LEFT EMPLOYEE TABLE
+;; ============================================================================
+
+[#Part : Payslip Left Emp Dtls]
+
+    Local : Field : Medium Prompt : Width : 17% Screen
+    Local : Field : Default       : Width : 32% Screen
+
+    Add : Lines : After : Payslip Location : NCRC Joining Date Line
+
+
+;; ============================================================================
+;; SECTION 10: EMPLOYEE NAME
+;; Reuses the native Employee Number row.
+;; ============================================================================
+
+[#Line : Payslip Emp Number]
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "Employee Name"
+    Local : Field : Medium Prompt : Style : Normal
+
+    Local : Field : Payslip Emp Number : Set As : ##CostCentreName
+    Local : Field : Payslip Emp Number : Style  : Normal Bold
+
+
+;; ============================================================================
+;; SECTION 11: FUNCTION
+;; ============================================================================
+
+[#Line : Payslip Function]
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "Function"
+    Local : Field : Medium Prompt : Style : Normal
+
+    Local : Field : Payslip Function : Style : Normal
+
+
+;; ============================================================================
+;; SECTION 12: DESIGNATION
+;; ============================================================================
+
+[#Line : Payslip Designation]
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "Designation"
+    Local : Field : Medium Prompt : Style : Normal
+
+    Local : Field : Payslip Designation : Style : Normal
+
+
+;; ============================================================================
+;; SECTION 13: LOCATION
+;; ============================================================================
+
+[#Line : Payslip Location]
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "Location"
+    Local : Field : Medium Prompt : Style : Normal
+
+    Local : Field : Payslip Location : Set As : "Islamabad, Pakistan"
+    Local : Field : Payslip Location : Style  : Normal
+
+
+;; ============================================================================
+;; SECTION 14: HIDE BANK DETAILS
+;; ============================================================================
+
+[#Line : Payslip Bank Details]
+
+    Invisible : Yes
+
+
+;; ============================================================================
+;; SECTION 15: ALTER RIGHT EMPLOYEE TABLE
+;;
+;; Native Payslip PassportDetails line is retained for CNIC retrieval.
+;; Custom lines are inserted around the native CNIC line.
+;; ============================================================================
+
+[#Part : Payslip Right Emp Dtls]
+
+    Local : Field : Medium Prompt : Width : 17% Screen
+    Local : Field : Default       : Width : 32% Screen
+
+    Add : Lines : Before : Payslip PassportDetails : NCRC Employee Number Line
+    Add : Lines : After  : Payslip PassportDetails : NCRC Status Line
+    Add : Lines : After  : NCRC Status Line         : NCRC DDO Line
+    Add : Lines : After  : NCRC DDO Line            : NCRC Scale Line
+
+
+;; ============================================================================
+;; SECTION 16: CNIC NUMBER
+;;
+;; Uses the employee PassportDetails method directly.
+;; No formatting or dash insertion is attempted.
+;;
+;; Confirmed native report fetch:
+;; PassportDetails from CostCentre : ##CostCentreName
+;; ============================================================================
+
+[#Line : Payslip PassportDetails]
+
+    Invisible : No
+
+    Space Top    : 0.08
+    Space Bottom : 0.08
+
+    Local : Field : Medium Prompt : Info  : "CNIC No."
+    Local : Field : Medium Prompt : Style : Normal
+
+    Local : Field : Payslip PassportDetails : Set As : +
+            $PassportDetails:CostCentre:##CostCentreName
+
+    Local : Field : Payslip PassportDetails : Style : Normal
+
+
+;; ============================================================================
+;; SECTION 17: HIDE UNUSED RIGHT-SIDE ROWS
+;; ============================================================================
+
+[#Line : Payslip PAN No]
+
+    Invisible : Yes
+
+
+[#Line : Payslip PF Acc No]
+
+    Invisible : Yes
+
+
+[#Line : Payslip ESI No]
+
+    Invisible : Yes
+
+
+[#Line : Payslip VisaExpiryDate]
+
+    Invisible : Yes
+
+
+;; ============================================================================
+;; SECTION 18: EARNINGS ROW PADDING
+;; ============================================================================
+
+[#Line : Pay Earnings]
+
+    Space Top    : 0.04
+    Space Bottom : 0.04
+
+
+;; ============================================================================
+;; SECTION 19: DEDUCTION ROW PADDING
+;; ============================================================================
+
+[#Line : Pay Deductions]
+
+    Space Top    : 0.04
+    Space Bottom : 0.04
+
+
+;; ============================================================================
+;; SECTION 20: PRINT HEAD NAMES WITHOUT ACCOUNT CODES
+;;
+;; PaySlipName is used when available.
+;; If PaySlipName is blank, the first five characters of Name are removed.
+;;
+;; Examples:
+;; 1101 BASIC PAY OF STAFF -> BASIC PAY OF STAFF
+;; 2101 INCOME TAX        -> INCOME TAX
+;;
+;; Normal display may retain the full native name.
+;; ============================================================================
+
+[#Field : Earning Title]
+
+    Set As : If $$InPrintMode Then +
+             If NOT $$IsEmpty:$PaySlipName Then +
+             $PaySlipName +
+             Else +
+             $$StringPart:$Name:5:$$StringLength:$Name +
+             Else +
+             $Name
+
+
+[#Field : DisplayEarningTitle]
+
+    Set As : If $$InPrintMode Then +
+             If NOT $$IsEmpty:$PaySlipName Then +
+             $PaySlipName +
+             Else +
+             $$StringPart:$Name:5:$$StringLength:$Name +
+             Else +
+             $Name
+
+
+[#Field : Deductions Title]
+
+    Set As : If $$InPrintMode Then +
+             If NOT $$IsEmpty:$PaySlipName Then +
+             $PaySlipName +
+             Else +
+             $$StringPart:$Name:5:$$StringLength:$Name +
+             Else +
+             $Name
+
+
+[#Field : Display DeductionsTitle]
+
+    Set As : If $$InPrintMode Then +
+             If NOT $$IsEmpty:$PaySlipName Then +
+             $PaySlipName +
+             Else +
+             $$StringPart:$Name:5:$$StringLength:$Name +
+             Else +
+             $Name
+
+
+;; ============================================================================
+;; SECTION 21: REMOVE NATIVE "FOR [COMPANY NAME]"
+;; ============================================================================
+
+[#Line : PaySlip Signature]
+
+    Local : Field : Simple Field : Invisible : Yes
+
+
+;; ============================================================================
+;; SECTION 22: ALTER PAYSLIP FOOTER
+;; ============================================================================
+
+[#Part : Payslip Authourity]
+
+    Delete : Lines : PaySlip Message
+
+    Add : Lines : After : PaySlip Authourity         : NCRC Accounts Officer Line
+    Add : Lines : After : NCRC Accounts Officer Line : NCRC Footer Spacer Line
+    Add : Lines : After : NCRC Footer Spacer Line    : NCRC Disclaimer One Line
+    Add : Lines : After : NCRC Disclaimer One Line   : NCRC Disclaimer Two Line
+
+;; ============================================================================
+;; MULTI PAYSLIP PRINT CUSTOMIZATION
+;; Append-only patch for Multi Payslip Print
+;; Does not alter the working individual PaySlip form
+;; ============================================================================
+
+[#Form : Multi Payslip Print]
+
+    Delete : Parts : Payslip Title with Logo Opt
+    Delete : Parts : Payslip Title
+
+    Add : Parts : At Beginning : NCRC Header Part
+
+
+;; ============================================================================
+;; REMOVE SPACE BEFORE EMPLOYEE TABLE IN MULTI PAYSLIP PRINT
+;; ============================================================================
+
+[#Form : Multi Payslip Print]
+
+    Local : Part : Payslip Emp Dtls : Space Top : 0
+
+;; ============================================================================
+;; END OF NCRC PAY SLIP CUSTOMIZATION - REVISION 16
+;; ============================================================================
+
+;; ============================================================================
+;; NCRC EMPLOYMENT STATUS MODULE
+;; EMPLOYEE CREATION, INDIVIDUAL PAYSLIP AND MULTI-PAYSLIP
+;; ============================================================================
+
+
+;; ============================================================================
+;; SECTION 1: EMPLOYMENT STATUS UDF STORAGE
+;;
+;; UDF index 19001 must not be used by another loaded customization.
+;; ============================================================================
+
+[System : UDF]
+
+    NCRCEmploymentStatus : String : 19001
+
+
+;; ============================================================================
+;; SECTION 2: EMPLOYMENT STATUS SELECTION LIST
+;; ============================================================================
+
+[Collection : NCRC Employment Status List]
+
+    Title       : "Employment Status"
+
+    List Name   : "Regular"
+    List Name   : "Contract"
+    List Name   : "Deputation"
+    List Name   : "Daily Wages"
+    List Name   : "Intern"
+    List Name   : "Project Employee"
+    List Name   : "Retired"
+    List Name   : "Terminated"
+
+    Format      : $Name, 25
+    Client Only : Yes
+
+
+;; ============================================================================
+;; SECTION 3: EMPLOYEE MASTER STATUS FIELD
+;;
+;; Set As reads the stored value.
+;; Storage saves the selected value against the Employee Cost Centre.
+;; ============================================================================
+
+[Field : NCRC Employment Status Master Field]
+
+    Use         : Name Field
+    Set As      : $NCRCEmploymentStatus
+    Storage     : NCRCEmploymentStatus
+
+    Table       : NCRC Employment Status List
+    Show Table  : Always
+
+    Width       : 20
+    Style       : Small Bold
+
+
+;; ============================================================================
+;; SECTION 4: EMPLOYEE MASTER STATUS LINE
+;;
+;; Uses the same Medium Prompt layout as the native fields in:
+;; Employee General Detail
+;; ============================================================================
+
+[Line : NCRC Employment Status Master Line]
+
+    Fields : Medium Prompt, NCRC Employment Status Master Field
+
+    Local : Field : Medium Prompt : Info  : "Employment Status"
+    Local : Field : Medium Prompt : Width : 17
+    Local : Field : Medium Prompt : Style : Normal
+
+    Space Bottom : 0.08
+
+
+;; ============================================================================
+;; SECTION 5: ADD STATUS TO EMPLOYEE CREATION AND ALTERATION
+;;
+;; Native Part confirmed:
+;; Employee General Detail
+;;
+;; Native line confirmed:
+;; Employee Location
+;;
+;; Native Employee General Detail has Height : 13.
+;; Height is increased to 14 so the newly inserted line is not clipped.
+;; ============================================================================
+
+[#Part : Employee General Detail]
+
+    Add    : Line : After : Employee Location : +
+             NCRC Employment Status Master Line
+
+    Height : 14
+
+
+;; ============================================================================
+;; SECTION 6: DISPLAY EMPLOYEE-SPECIFIC STATUS ON PAYSLIP
+;;
+;; Revision 16 already defines NCRC Status Field.
+;;
+;; If no status has been saved for an existing employee, the payslip continues
+;; to show Regular.
+;; ============================================================================
+
+[#Field : NCRC Status Field]
+
+    Set As : If $$IsEmpty:$NCRCEmploymentStatus:CostCentre:##CostCentreName Then +
+             "Regular" +
+             Else +
+             $NCRCEmploymentStatus:CostCentre:##CostCentreName
+
+
+;; ============================================================================
+;; SECTION 7: FETCH STATUS FOR MULTI-PAYSLIP PRINTING
+;; ============================================================================
+
+[#Collection : MultiPayslip Employees]
+
+    Fetch : NCRCEmploymentStatus
+
+
+;; ============================================================================
+;; END OF NCRC EMPLOYMENT STATUS MODULE
+;; ============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;; ============================================================================
+;; NCRC MULTI EMPLOYEE CREATION / ALTERATION MODULE
+;; DESIGNATION, DATE OF LEAVING AND CNIC
+;; EMPLOYMENT STATUS REMOVED FROM MULTI EMPLOYEE SCREEN
+;; ============================================================================
+;;
+;; PURPOSE
+;; -------
+;; 1. Adds editable Designation to Multi Employee Creation / Alteration
+;; 2. Retains the native Date of Leaving field
+;; 3. Adds editable CNIC to Multi Employee Creation / Alteration
+;;
+;; IMPORTANT
+;; ---------
+;; Employment Status is deliberately excluded from this Multi Employee module.
+;;
+;; Employment Status remains available in:
+;;
+;; 1. Individual Employee Creation / Alteration
+;; 2. Individual payslip printing
+;; 3. Multi-payslip printing
+;;
+;; STORAGE MAPPING
+;; ---------------
+;; Designation       : Designation
+;; Date of Leaving   : DeactivationDate
+;; CNIC              : PassportDetails
+;;
+;; ============================================================================
+
+
+;; ============================================================================
+;; SECTION 1: ADDITIONAL COLUMN-TITLE FIELDS
+;; ============================================================================
+
+[Field : NCRC Multi Designation Title]
+
+    Use        : Name Title Field
+    Set As     : "Designation"
+    Width      : 16% Screen
+    Align      : Centre
+    Style      : Normal Bold
+    Border     : Thin Left
+
+
+[Field : NCRC Multi CNIC Title]
+
+    Use        : Name Title Field
+    Set As     : "CNIC"
+    Width      : 15% Screen
+    Align      : Centre
+    Style      : Normal Bold
+    Border     : Thin Left
+
+
+;; ============================================================================
+;; SECTION 2: EDITABLE DESIGNATION FIELD
+;;
+;; Uses the native Employee Designation storage.
+;; ============================================================================
+
+[Field : NCRC Multi Designation Field]
+
+    Use        : Name Field
+    Storage    : Designation
+
+    Width      : 16% Screen
+    Style      : Small
+    Border     : Thin Left
+
+    Inactive   : $$IsEmpty:$Name
+
+
+;; ============================================================================
+;; SECTION 3: EDITABLE CNIC FIELD
+;;
+;; PassportDetails continues to be used as CNIC storage so that the value
+;; remains compatible with:
+;;
+;; 1. Individual Employee Creation / Alteration
+;; 2. Individual payslip printing
+;; 3. Multi-payslip printing
+;; ============================================================================
+
+[Field : NCRC Multi CNIC Field]
+
+    Use        : Name Field
+    Storage    : PassportDetails
+
+    Width      : 15% Screen
+    Style      : Small
+    Border     : Thin Left
+
+    Inactive   : $$IsEmpty:$Name
+
+
+;; ============================================================================
+;; SECTION 4: ADD COLUMN TITLES TO MULTI EMPLOYEE SCREEN
+;;
+;; Native columns:
+;;
+;; S.No.
+;; Category
+;; Employee Name
+;; Under
+;; Date of Joining
+;; Date of Leaving
+;;
+;; Additional columns:
+;;
+;; Designation
+;; CNIC
+;; ============================================================================
+
+[#Line : Multi Employee Titles]
+
+    Add : Fields : After : Multi Master Join Date Title : +
+          NCRC Multi Designation Title, +
+          NCRC Multi CNIC Title
+
+    Local : Field : MultiSNo Title : +
+            Width : 4% Screen
+
+    Local : Field : MCSTCTR CategoryTitle : +
+            Width : 12% Screen
+
+    Local : Field : Multi Master Name Title : +
+            Width : 18% Screen
+
+    Local : Field : Multi Master Parent Title : +
+            Width : 10% Screen
+
+    Local : Field : Multi Master Join Date Title : +
+            Width : 8% Screen
+
+    Local : Field : Multi Master Leaving Date Title : +
+            Width : 10% Screen
+
+    Local : Field : Multi Master Leaving Date Title : +
+            Invisible : $$InCreateMode
+
+
+;; ============================================================================
+;; SECTION 5: ADD EDITABLE FIELDS TO EACH EMPLOYEE ROW
+;;
+;; Designation and CNIC are inserted after Date of Joining.
+;;
+;; The native Employee DeactiveDate field remains the Date of Leaving field.
+;; ============================================================================
+
+[#Line : Multi Employee Body]
+
+    Add : Fields : After : Employee DateOfJoin : +
+          NCRC Multi Designation Field, +
+          NCRC Multi CNIC Field
+
+    Local : Field : Multi SNo : +
+            Width : 4% Screen
+
+    Local : Field : CSTCTR Category : +
+            Width : 12% Screen
+
+    Local : Field : Multi MST Name : +
+            Width : 18% Screen
+
+    Local : Field : MST Parent : +
+            Width : 10% Screen
+
+    Local : Field : Employee DateOfJoin : +
+            Width : 8% Screen
+
+    Local : Field : Employee DeactiveDate : +
+            Width : 10% Screen
+
+    Local : Field : Multi MST Name : +
+            Style : Small
+
+    Local : Field : MST Parent : +
+            Style : Small
+
+    Local : Field : CSTCTR Category : +
+            Style : Small
+
+    Local : Field : Employee DateOfJoin : +
+            Style : Small
+
+    Local : Field : Employee DeactiveDate : +
+            Style : Small
+
+    Local : Field : Employee DeactiveDate : +
+            Invisible : $$InCreateMode
+
+
+;; ============================================================================
+;; SECTION 6: FETCH ADDITIONAL EMPLOYEE VALUES
+;;
+;; Employment Status is not included in this Multi Employee module.
+;; ============================================================================
+
+[#Collection : All Employees Under MCostCentre]
+
+    Add : Fetch : Designation, DeactivationDate, PassportDetails
+
+
+;; ============================================================================
+;; END OF NCRC MULTI EMPLOYEE CREATION / ALTERATION MODULE
+;; ============================================================================
