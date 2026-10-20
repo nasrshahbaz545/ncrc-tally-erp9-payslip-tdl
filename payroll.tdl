@@ -6,7 +6,7 @@
 ;; FINAL REQUIREMENTS
 ;; ------------------
 ;; 1. Company name in header
-;; 2. Title-1 of Pakistan below company name
+;; 2. Government of Pakistan below company name
 ;; 3. Single native dynamic payslip period in custom header
 ;; 4. No duplicate native title
 ;; 5. No empty space between header and employee table
@@ -14,7 +14,7 @@
 ;; 7. Employee Number in right table
 ;; 8. CNIC retrieved from PassportDetails without formatting
 ;; 9. Status shown as Regular
-;; 10. DDO Code shown as 
+;; 10. DDO Code shown as IB0762
 ;; 11. Scale taken from employee parent group
 ;; 12. Location shown as Islamabad, Pakistan
 ;; 13. Date of Joining retrieved from employee master
@@ -42,10 +42,10 @@
     Style      : Normal Bold
 
 
-[Field : NCRC Title-1 Field]
+[Field : NCRC Government Field]
 
     Use        : Name Field
-    Set As     : "Title-1 of Pakistan"
+    Set As     : "Government of Pakistan"
     Full Width : Yes
     Align      : Centre
     Style      : Normal Bold
@@ -74,7 +74,7 @@
 [Field : NCRC DDO Field]
 
     Use        : Name Field
-    Set As     : "DDO-ISB"
+    Set As     : "IB-0762"
     Width      : 32% Screen
     Style      : Normal
 
@@ -99,9 +99,9 @@
 ;; SECTION 3: HEADER LINES
 ;; ============================================================================
 
-[Line : NCRC Title-1 Line]
+[Line : NCRC Government Line]
 
-    Field : NCRC Title-1 Field
+    Field : NCRC Government Field
 
 
 [Line : NCRC Company Line]
@@ -233,7 +233,7 @@
 
 [Part : NCRC Header Part]
 
-    Lines : NCRC Title-1 Line, +
+    Lines : NCRC Government Line, +
 		NCRC Company Line
             
     Space Top    : 0
